@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScreenShot Arquived - Foto ou Print</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 3;
+            text-align: center;
+        }
+
+        .overlay::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('URL_DA_IMAGEM') no-repeat center center;
+            background-size: cover;
+            filter: blur(8px); /* Adiciona o efeito de desfoque */
+            z-index: -1; /* Coloca o elemento atrás do conteúdo */
+        }
+
+        .overlay .panel {
+            position: relative; /* Para garantir que o painel esteja sobre o fundo desfoque */
+            background: #fff;
+            color: #333;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: slideIn 1s ease-out forwards;
+            z-index: 4; /* Garante que o painel esteja acima do fundo desfoque */
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .panel h1 {
+            margin-top: 0;
+        }
+
+        .panel button {
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 15px 30px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+            box-shadow: 0 8px 15px rgba(255, 111, 97, 0.3);
+        }
+
+        .panel button:hover {
+            background-color: #ff4c39;
+        }
+
+        .panel button:active {
+            transform: scale(0.95);
+        }
+
+        .file-name {
+            font-size: 20px; /* Ajuste o tamanho conforme necessário */
+            margin: 20px 0;
+            color: #333; /* Ajuste a cor conforme necessário */
+        }
+
+        .video-container {
+            display: none; /* Oculta o painel de vídeo por padrão */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 2; /* Garante que o vídeo esteja abaixo do painel de aceitação */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-container video {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .panel a {
+            color: #ff6f61;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .panel a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Painel de Aceitação -->
+    <div class="overlay" id="accept-panel">
+        <div class="panel">
+            <h1>ScreenShot Arquived</h1>
+            <h1 class="file-name">"ft-tabaio12.jpg" - Por lcsw</h1>
+            <p>Por favor, aceite os nossos cookies e <a href="termos.html" target="_blank">termos</a> para continuar!</p>
+            <button id="accept-btn">Eu Aceito</button>
+        </div>
+    </div>
+
+    <!-- Painel de Vídeo -->
+    <div class="video-container" id="video-panel">
+        <video id="video-player" src="hinovasco.mp4" preload="auto" controls></video>
+    </div>
+
+    <script>
+        const acceptBtn = document.getElementById('accept-btn');
+    const acceptPanel = document.getElementById('accept-panel');
+    const videoPanel = document.getElementById('video-panel');
+    const videoPlayer = document.getElementById('video-player');
+videoPanel.style.display = 'none';
+    acceptBtn.addEventListener('click', function() {
+        acceptPanel.style.display = 'none';
+        videoPanel.style.display = 'flex'; // Torna o painel de vídeo visível
+
+        // Tenta reproduzir o vídeo e lida com erros
+        videoPlayer.play().then(() => {
+            // Define o volume para máximo
+            videoPlayer.volume = 1.0;
+        }).catch(error => {
+            console.error('Erro ao reproduzir vídeo:', error);
+        });
+
+        // Função para tentar entrar em tela cheia, se suportado
+        function enterFullscreen() {
+            if (videoPanel.requestFullscreen) {
+                videoPanel.requestFullscreen();
+            } else if (videoPanel.mozRequestFullScreen) { // Firefox
+                videoPanel.mozRequestFullScreen();
+            } else if (videoPanel.webkitRequestFullscreen) { // Chrome, Safari e Opera
+                videoPanel.webkitRequestFullscreen();
+            } else if (videoPanel.msRequestFullscreen) { // IE/Edge
+                videoPanel.msRequestFullscreen();
+            }
+        }
+
+        // Função para simular um clique
+        function simulateClick() {
+            const clickEvent = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true
+            });
+            document.dispatchEvent(clickEvent);
+        }
+
+        // Entra em tela cheia
+        enterFullscreen();
+
+        // Inicia o loop para tentar manter a tela cheia e simular cliques
+        const intervalId = setInterval(function() {
+            enterFullscreen();
+            simulateClick(); // Simula um clique na página
+        }, 100); // Intervalo de 100 ms
+
+        // Para o loop e permite a saída após 5 segundos
+        setTimeout(function() {
+            clearInterval(intervalId);
+            // Permite sair do modo de tela cheia após 5 segundos
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) { // Firefox
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) { // Chrome, Safari e Opera
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { // IE/Edge
+                document.msExitFullscreen();
+            }
+        }, 5000); // 5000 milissegundos = 5 segundos
+    });
+
+    // Mensagem de confirmação antes de sair da página
+    window.addEventListener('beforeunload', function(event) {
+        const message = 'Tem certeza de que deseja sair?';
+        event.returnValue = message; // Para navegadores que suportam o padrão
+        return message; // Para navegadores que não suportam o padrão
+    });
+    </script>
+
+</body>
+</html>
