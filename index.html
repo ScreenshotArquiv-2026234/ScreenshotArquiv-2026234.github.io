@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScreenShot Arquived</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .upload-container {
+    background: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 100%; /* Garante que a largura seja ajustada conforme o contêiner pai */
+    animation: slideIn 1s ease-out forwards;
+}
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .upload-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .upload-preview {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .upload-preview img {
+            max-width: 40%;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-btn, .confirm-btn, .copy-btn, .reset-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #ff6f61;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+            box-shadow: 0 8px 15px rgba(255, 111, 97, 0.3);
+            margin-top: 20px;
+        }
+
+        .upload-btn:hover, .confirm-btn:hover, .copy-btn:hover, .reset-btn:hover {
+            background-color: #ff4c39;
+        }
+
+        .upload-btn:active, .confirm-btn:active, .copy-btn:active, .reset-btn:active {
+            transform: scale(0.95);
+        }
+
+        .note {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .textbox-container {
+    display: none;
+    text-align: center; /* Adiciona centralização de texto */
+    margin: 20px 0; /* Adiciona espaço ao redor do contêiner */
+}
+
+.textbox-container input[type="text"] {
+    padding: 10px;
+    width: calc(100% - 90px); /* Ajusta a largura para considerar o espaço do botão copiar */
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    text-align: center;
+    pointer-events: none;
+    background-color: #f0f0f0;
+    overflow-x: auto; /* Permite rolagem horizontal */
+    display: inline-block; /* Permite que o campo de texto e o botão fiquem lado a lado */
+}
+
+        .textbox-container{
+            padding: 10px;
+            font-size: 14px;
+            margin-top: 0;
+            margin-left: 0px;
+			width: 95%;
+        }
+		.copy-btn {
+    padding: 10px;
+    font-size: 14px;
+    margin-left: 10px; /* Adiciona um pouco de espaço ao lado do botão de copiar */
+    display: inline-block; /* Garante que o botão de copiar fique ao lado do campo de texto */
+    vertical-align: middle; /* Alinha verticalmente com o campo de texto */
+}
+    </style>
+</head>
+<body>
+
+    <div class="upload-container">
+        <h2>ScreenShot Arquived</h2>
+        <div class="upload-preview">
+            <img id="preview-img" src="#" alt="Pré-visualização da Imagem">
+        </div>
+        <input type="file" id="file-upload" accept="image/*" style="display: none;">
+        <label for="file-upload" class="upload-btn">Escolher Imagem</label>
+        <p class="note">Clique no botão acima para fazer o upload.</p>
+        <button class="confirm-btn" style="display:none;">Confirmar</button>
+        <div class="textbox-container">
+            <input type="text" id="generated-url" readonly>
+            <button class="copy-btn">Copiar</button>
+        </div>
+        <button class="reset-btn" style="display:none;">Recomeçar</button>
+        <p class="note" id="final-note" style="display:none;">Aqui está a URL de sua imagem!</p>
+    </div>
+
+    <script>
+        const fileUpload = document.getElementById('file-upload');
+        const previewImg = document.getElementById('preview-img');
+        const uploadPreview = document.querySelector('.upload-preview');
+        const uploadBtn = document.querySelector('.upload-btn');
+        const confirmBtn = document.querySelector('.confirm-btn');
+        const note = document.querySelector('.note');
+        const textboxContainer = document.querySelector('.textbox-container');
+        const generatedUrl = document.getElementById('generated-url');
+        const copyBtn = document.querySelector('.copy-btn');
+        const resetBtn = document.querySelector('.reset-btn');
+        const finalNote = document.getElementById('final-note');
+
+        fileUpload.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    uploadPreview.style.display = 'block';
+                    uploadBtn.style.display = 'none';
+                    note.style.display = 'none';
+                    confirmBtn.style.display = 'inline-block';
+                    note.innerText = "Clique no botão abaixo para confirmar o upload.";
+                    note.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        confirmBtn.addEventListener('click', function() {
+            uploadPreview.style.opacity = '0';
+            setTimeout(function() {
+                uploadPreview.style.display = 'none';
+                confirmBtn.style.display = 'none';
+                note.style.display = 'none';
+                textboxContainer.style.display = 'block';
+                generatedUrl.value = "https://ScreenshotArquiv-2026234.github.io/screenprint/" + Math.random().toString(36).substr(2, 10);
+                resetBtn.style.display = 'inline-block';
+                finalNote.style.display = 'block';
+            }, 500);
+        });
+
+        copyBtn.addEventListener('click', function() {
+            generatedUrl.select();
+            document.execCommand('copy');
+            alert("URL copiada!");
+        });
+
+        resetBtn.addEventListener('click', function() {
+            location.reload();
+        });
+    </script>
+
+</body>
+</html>
